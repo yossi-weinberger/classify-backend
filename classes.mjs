@@ -4,18 +4,6 @@ import { getDatabase } from "./mongoConnect.mjs";
 
 const router = Router();
 
-// Create a new schoolClass
-router.post("/", async (req, res) => {
-  try {
-    const db = await getDatabase();
-    const classesCollection = db.collection("classes");
-    await classesCollection.insertOne(req.body);
-    res.status(201).send("class created successfully");
-  } catch (error) {
-    res.json({ error: error, status: "Error" });
-  }
-});
-
 // Get all classes
 router.get("/", async (req, res) => {
   try {
@@ -116,21 +104,93 @@ router.get("/:classId/:studentId", async (req, res) => {
   }
 });
 
-// Update a schoolClass
-router.patch("/:id", async (req, res) => {
-  const classes = await classesCollection.updateOne(
-    { _id: new ObjectId(req.params.id) },
-    { $set: req.body }
+// Add a personal note to a student
+router.post("/students/:idil/notes", async (req, res) => {
+  console.log(
+    `Received request to add note for student IDIL: ${req.params.idil}`
   );
-  res.json({ data: classes, status: "success" });
+  console.log(`Request body:`, req.body);
+  try {
+    const db = await getDatabase();
+    const studentsCollection = db.collection("students");
+
+    const idil = parseInt(req.params.idil);
+    if (isNaN(idil)) {
+      return res
+        .status(400)
+        .json({ message: "Invalid IDIL format", data: null });
+    }
+
+    const { note } = req.body;
+
+    if (!note) {
+      return res
+        .status(400)
+        .json({ message: "Note text is required", data: null });
+    }
+
+    const newNote = {
+      date: new Date().toISOString().split("T")[0], // Format: YYYY-MM-DD
+      note: note,
+    };
+
+    console.log(`Attempting to add note:`, newNote);
+
+    const result = await studentsCollection.updateOne(
+      { idil: idil },
+      { $push: { personalNotes: newNote } }
+    );
+
+    console.log(`Update result:`, result);
+
+    if (result.matchedCount === 0) {
+      return res.status(404).json({ message: "Student not found", data: null });
+    }
+
+    if (result.modifiedCount === 0) {
+      return res.status(400).json({ message: "Note not added", data: null });
+    }
+
+    res.json({
+      data: newNote,
+      status: "success",
+      message: "Note added successfully",
+    });
+  } catch (error) {
+    console.error("Detailed error:", error);
+    res
+      .status(500)
+      .json({ error: "Internal server error", details: error.message });
+  }
 });
 
-// Delete a schoolClass
-router.delete("/:id", async (req, res) => {
-  const classes = await classesCollection.deleteOne({
-    _id: new ObjectId(req.params.id),
-  });
-  res.json({ data: classes, status: "success" });
-});
+// // Create a new schoolClass
+// router.post("/", async (req, res) => {
+//   try {
+//     const db = await getDatabase();
+//     const classesCollection = db.collection("classes");
+//     await classesCollection.insertOne(req.body);
+//     res.status(201).send("class created successfully");
+//   } catch (error) {
+//     res.json({ error: error, status: "Error" });
+//   }
+// });
+
+// // Update a schoolClass
+// router.patch("/:id", async (req, res) => {
+//   const classes = await classesCollection.updateOne(
+//     { _id: new ObjectId(req.params.id) },
+//     { $set: req.body }
+//   );
+//   res.json({ data: classes, status: "success" });
+// });
+
+// // Delete a schoolClass
+// router.delete("/:id", async (req, res) => {
+//   const classes = await classesCollection.deleteOne({
+//     _id: new ObjectId(req.params.id),
+//   });
+//   res.json({ data: classes, status: "success" });
+// });
 
 export default router;

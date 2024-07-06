@@ -1,6 +1,7 @@
 import express from "express";
 import connectToDatabase from "./mongoConnect.mjs";
 import classes from "./classes.mjs";
+import students from "./students.mjs";
 // import students from "./students.mjs";
 import { expressjwt as jwt } from "express-jwt";
 import dotenv from "dotenv";
@@ -23,7 +24,7 @@ app.use(
 );
 // app.use("/users", users);
 app.use("/classes", classes);
-// app.use("/students", students);
+app.use("/students", students);
 // app.use("/api/graph", graph);
 
 app.use((err, req, res, next) => {

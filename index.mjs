@@ -10,7 +10,6 @@ import cors from "cors";
 dotenv.config();
 
 const app = express();
-const port = process.env.PORT || 3001;
 
 async function startServer() {
   try {
@@ -40,18 +39,20 @@ async function startServer() {
       console.error(err.stack);
       res.status(500).send(err.message);
     });
-
-    if (process.env.NODE_ENV !== "production") {
-      app.listen(port, () => {
-        console.log(`Server running on port ${port}`);
-      });
-    }
   } catch (error) {
     console.error("Error starting server:", error);
   }
 }
 
 startServer();
+
+// This is for local development
+if (process.env.NODE_ENV !== "production") {
+  const port = process.env.PORT || 3001;
+  app.listen(port, () => {
+    console.log(`Server running on port ${port}`);
+  });
+}
 
 export default app;
 

@@ -2,7 +2,9 @@ import express from "express";
 import connectToDatabase from "./mongoConnect.mjs";
 import classes from "./classes.mjs";
 import students from "./students.mjs";
-import cloudinaryRoutes, { checkCloudinaryConnection } from "./cloudinary.mjs";
+import cloudinaryRoutes, {
+  checkCloudinaryConnection,
+} from "./api/cloudinary.mjs";
 import { expressjwt as jwt } from "express-jwt";
 import dotenv from "dotenv";
 import cors from "cors";
@@ -33,7 +35,7 @@ async function startServer() {
 
     app.use("/classes", classes);
     app.use("/students", students);
-    app.use("/cloudinary", cloudinaryRoutes);
+    app.use("/api/cloudinary", cloudinaryRoutes);
 
     app.use((err, req, res, next) => {
       console.error(err.stack);

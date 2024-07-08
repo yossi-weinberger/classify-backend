@@ -1,16 +1,11 @@
 {
   "version": 2,
   "builds": [
-    {
-      "src": "index.mjs",
-      "use": "@vercel/node"
-    }
+    { "src": "index.mjs", "use": "@vercel/node" },
+    { "src": "api/test-cloudinary.js", "use": "@vercel/node" }
   ],
   "routes": [
-    {
-      "src": "/(.*)",
-      "dest": "/index.mjs"
-    }
-  ],
-  "buildCommand": "npm install"
+    { "src": "/api/test-cloudinary", "dest": "/api/test-cloudinary.js" },
+    { "src": "/(.*)", "dest": "/index.mjs" }
+  ]
 }

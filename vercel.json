@@ -1,11 +1,5 @@
 {
   "version": 2,
-  "builds": [
-    { "src": "index.mjs", "use": "@vercel/node" },
-    { "src": "api/**/*.js", "use": "@vercel/node" }
-  ],
-  "routes": [
-    { "src": "/api/cloudinary", "dest": "/api/cloudinary.mjs" },
-    { "src": "/(.*)", "dest": "/index.mjs" }
-  ]
+  "builds": [{ "src": "index.mjs", "use": "@vercel/node" }],
+  "routes": [{ "src": "/(.*)", "dest": "/index.mjs" }]
 }

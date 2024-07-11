@@ -57,9 +57,6 @@ router.post("/upload", async (req, res) => {
 });
 
 export default router;
-
-// import express from "express";
-// import { v2 as cloudinary } from "cloudinary";
 // import fileUpload from "express-fileupload";
 
 // const router = express.Router();

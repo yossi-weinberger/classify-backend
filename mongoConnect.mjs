@@ -10,12 +10,7 @@ let db;
 let classesCollection;
 let studentsCollection;
 
-/**
- * Connects to the MongoDB database and initializes collections.
- * @param {number} retries - Number of connection retry attempts.
- * @returns {Promise<{db: Db, classesCollection: Collection, studentsCollection: Collection}>}
- * @throws {Error} If unable to connect after max retries.
- */
+//
 async function connectToDatabase(retries = 5) {
   while (retries) {
     try {
@@ -55,10 +50,6 @@ async function connectToDatabase(retries = 5) {
   }
 }
 
-/**
- * Gets the database connection and collections.
- * @returns {Promise<{db: Db, classesCollection: Collection, studentsCollection: Collection}>}
- */
 export async function getDatabase() {
   if (!db) {
     ({ db, classesCollection, studentsCollection } = await connectToDatabase());
@@ -66,10 +57,6 @@ export async function getDatabase() {
   return { db, classesCollection, studentsCollection };
 }
 
-/**
- * Closes the database connection.
- * @returns {Promise<void>}
- */
 export async function closeConnection() {
   if (client) {
     await client.close();

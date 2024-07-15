@@ -92,65 +92,45 @@ router.get("/:classId/:studentId", async (req, res) => {
   }
 });
 
-// /**
-//  * Add a personal note to a student
-//  */
-// router.post("/students/:idil/notes", async (req, res) => {
-//   console.log(
-//     `Received request to add note for student IDIL: ${req.params.idil}`
-//   );
-//   console.log(`Request body:`, req.body);
-//   try {
-//     const { studentsCollection } = await getDatabase();
+// Create a new class
+router.post("/", async (req, res) => {
+  try {
+    const { classesCollection } = await getDatabase();
+    const { className, teacher, img } = req.body;
 
-//     const idil = parseInt(req.params.idil);
-//     if (isNaN(idil)) {
-//       return res
-//         .status(400)
-//         .json({ message: "Invalid IDIL format", data: null });
-//     }
+    // Basic validation
+    if (!className || !teacher) {
+      return res
+        .status(400)
+        .json({ message: "Missing essential details", data: null });
+    }
 
-//     const { note } = req.body;
+    // Check if a class already exists
+    const existingClass = await classesCollection.findOne({ className });
+    if (existingClass) {
+      return res.status(409).json({
+        message: "A class with this name already exists",
+        data: null,
+      });
+    }
 
-//     if (!note) {
-//       return res
-//         .status(400)
-//         .json({ message: "Note text is required", data: null });
-//     }
+    const newClass = {
+      className,
+      teacher,
+      img,
+    };
 
-//     const newNote = {
-//       date: new Date().toISOString().split("T")[0],
-//       note: note,
-//     };
+    const result = await classesCollection.insertOne(newClass);
 
-//     console.log(`Attempting to add note:`, newNote);
-
-//     const result = await studentsCollection.updateOne(
-//       { idil: idil },
-//       { $push: { personalNotes: newNote } }
-//     );
-
-//     console.log(`Update result:`, result);
-
-//     if (result.matchedCount === 0) {
-//       return res.status(404).json({ message: "Student not found", data: null });
-//     }
-
-//     if (result.modifiedCount === 0) {
-//       return res.status(400).json({ message: "Note not added", data: null });
-//     }
-
-//     res.json({
-//       data: newNote,
-//       status: "success",
-//       message: "Note added successfully",
-//     });
-//   } catch (error) {
-//     console.error("Detailed error:", error);
-//     res
-//       .status(500)
-//       .json({ error: "Internal server error", details: error.message });
-//   }
-// });
+    res.status(201).json({
+      data: newClass,
+      status: "success",
+      message: "Class created successfully",
+    });
+  } catch (error) {
+    console.error("Error creating new class:", error);
+    res.status(500).json({ error: "Internal server error" });
+  }
+});
 
 export default router;

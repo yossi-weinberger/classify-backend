@@ -3,45 +3,6 @@ import { getDatabase } from "./mongoConnect.mjs";
 
 const router = Router();
 
-// // Get all students
-// router.get("/", async (req, res) => {
-//   try {
-//     const { studentsCollection } = await getDatabase();
-//     const students = await studentsCollection.find().toArray();
-//     res.json({ data: students, status: "success" });
-//   } catch (error) {
-//     console.error("Error fetching all students:", error);
-//     res.status(500).json({ error: "Internal server error" });
-//   }
-// });
-
-// // Get a student by IDIL
-// router.get("/:idil", async (req, res) => {
-//   try {
-//     const { studentsCollection, classesCollection } = await getDatabase();
-//     const idil = parseInt(req.params.idil);
-
-//     const student = await studentsCollection.findOne({ idil });
-//     if (!student) {
-//       return res.status(404).json({ message: "Student not found", data: null });
-//     }
-
-//     const classDetails = await classesCollection.findOne({ className: student.class });
-
-//     res.json({
-//       data: {
-//         class: classDetails,
-//         student: student
-//       },
-//       status: "success"
-//     });
-//   } catch (error) {
-//     console.error("Error fetching student:", error);
-//     res.status(500).json({ error: "Internal server error" });
-//   }
-// });
-
-// Create a new student
 // Create a new student
 router.post("/", async (req, res) => {
   try {

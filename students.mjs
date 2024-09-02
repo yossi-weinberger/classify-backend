@@ -9,8 +9,10 @@ router.post("/", async (req, res) => {
     const { studentsCollection, classesCollection } = await getDatabase();
     const {
       idil,
+      gender,
       firstName,
       lastName,
+      fullName,
       class: className,
       dateOfBirth,
       fatherName,
@@ -48,8 +50,10 @@ router.post("/", async (req, res) => {
 
     const newStudent = {
       idil,
+      gender,
       firstName,
       lastName,
+      fullName,
       class: className,
       dateOfBirth,
       fatherName,

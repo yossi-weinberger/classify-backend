@@ -102,14 +102,14 @@ router.post("/", async (req, res) => {
     if (!className || !teacher) {
       return res
         .status(400)
-        .json({ message: "Missing essential details", data: null });
+        .json({ message: "נא למלא את כל הפרטים", data: null });
     }
 
     // Check if a class already exists
     const existingClass = await classesCollection.findOne({ className });
     if (existingClass) {
       return res.status(409).json({
-        message: "A class with this name already exists",
+        message: `כיתה "${className}" כבר קיימת`,
         data: null,
       });
     }

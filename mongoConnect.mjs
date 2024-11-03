@@ -4,13 +4,19 @@ import dotenv from "dotenv";
 dotenv.config();
 
 const getMongoURI = () => {
+  // בורסל תמיד צריך להתחבר ל-Atlas
+  if (process.env.VERCEL) {
+    console.log("[MongoDB] Environment: Vercel (Atlas)");
+    return `mongodb+srv://${process.env.MONGO_USERNAME}:${process.env.MONGO_PASSWORD}@cluster0.dt4vuto.mongodb.net/?retryWrites=true&w=majority&appName=Cluster0`;
+  }
+
   if (process.env.NODE_ENV === "production") {
     console.log("[MongoDB] Environment: Production (Docker)");
     return `mongodb://${process.env.MONGO_INITDB_ROOT_USERNAME}:${process.env.MONGO_INITDB_ROOT_PASSWORD}@mongodb:27017/?retryWrites=true&w=majority`;
-  } else {
-    console.log("[MongoDB] Environment: Development (Atlas)");
-    return `mongodb+srv://${process.env.MONGO_USERNAME}:${process.env.MONGO_PASSWORD}@cluster0.dt4vuto.mongodb.net/?retryWrites=true&w=majority&appName=Cluster0`;
   }
+
+  console.log("[MongoDB] Environment: Development (Atlas)");
+  return `mongodb+srv://${process.env.MONGO_USERNAME}:${process.env.MONGO_PASSWORD}@cluster0.dt4vuto.mongodb.net/?retryWrites=true&w=majority&appName=Cluster0`;
 };
 
 const uri = getMongoURI();

@@ -43,19 +43,26 @@ jobs:
             echo "🆕 No previous run found. Proceeding with first ping."
           fi
 
+      - name: Setup Node.js
+        if: steps.check-interval.outputs.should_run == 'true'
+        uses: actions/setup-node@v4
+        with:
+          node-version: '18'
+          cache: 'npm'
+
+      - name: Install dependencies
+        if: steps.check-interval.outputs.should_run == 'true'
+        run: npm ci
+
       - name: Ping Supabase
         if: steps.check-interval.outputs.should_run == 'true'
+        env:
+          SUPABASE_URL: ${{ secrets.SUPABASE_URL }}
+          SUPABASE_KEY: ${{ secrets.SUPABASE_KEY }}
         run: |
-          # Replace with your actual Supabase ping logic
           echo "🏓 Pinging Supabase..."
-          
-          # Example: Health check endpoint
-          # curl -f "${{ secrets.SUPABASE_URL }}/rest/v1/" \
-          #   -H "apikey: ${{ secrets.SUPABASE_ANON_KEY }}" \
-          #   -H "Authorization: Bearer ${{ secrets.SUPABASE_ANON_KEY }}"
-          
-          # For now, just a placeholder
-          echo "Supabase ping completed successfully"
+          npm run ping-supabase
+          echo "✅ Supabase ping completed successfully"
 
       - name: Update last run timestamp
         if: steps.check-interval.outputs.should_run == 'true'

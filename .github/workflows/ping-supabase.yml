@@ -1,3 +1,4 @@
+
 name: Ping Supabase Every 3 Days
 
 on:
@@ -12,7 +13,6 @@ jobs:
     steps:
       - name: Checkout repository
         uses: actions/checkout@v4
-
       - name: Check if 3 days have passed
         id: check-interval
         run: |

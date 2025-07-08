@@ -10,6 +10,8 @@ on:
 jobs:
   check-and-ping:
     runs-on: ubuntu-latest
+    permissions:
+      contents: write  # Required to commit and push timestamp updates
     steps:
       - name: Checkout repository
         uses: actions/checkout@v4
@@ -74,7 +76,12 @@ jobs:
           git config --local user.email "action@github.com"
           git config --local user.name "GitHub Action"
           
-          # Commit the updated timestamp
+          # Commit and push the updated timestamp
           git add .github/last-ping-timestamp
-          git commit -m "Update last ping timestamp [automated]" || exit 0
-          git push
+          if git diff --staged --quiet; then
+            echo "No changes to commit"
+          else
+            git commit -m "Update last ping timestamp [automated]"
+            git push
+            echo "✅ Timestamp updated successfully"
+          fi

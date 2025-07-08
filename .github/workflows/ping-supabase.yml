@@ -1,0 +1,73 @@
+name: Ping Supabase Every 3 Days
+
+on:
+  schedule:
+    # Run daily at midnight UTC to check if we should ping
+    - cron: '0 0 * * *'
+  workflow_dispatch: # Allow manual triggering
+
+jobs:
+  check-and-ping:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Check if 3 days have passed
+        id: check-interval
+        run: |
+          # File to store the last execution timestamp
+          LAST_RUN_FILE=".github/last-ping-timestamp"
+          CURRENT_TIME=$(date +%s)
+          THREE_DAYS_IN_SECONDS=259200  # 3 * 24 * 60 * 60
+          
+          # Check if the timestamp file exists
+          if [ -f "$LAST_RUN_FILE" ]; then
+            LAST_RUN=$(cat "$LAST_RUN_FILE")
+            TIME_DIFF=$((CURRENT_TIME - LAST_RUN))
+            
+            echo "Last run: $(date -d @$LAST_RUN)"
+            echo "Current time: $(date -d @$CURRENT_TIME)"
+            echo "Time difference: $TIME_DIFF seconds"
+            echo "Required interval: $THREE_DAYS_IN_SECONDS seconds"
+            
+            if [ $TIME_DIFF -ge $THREE_DAYS_IN_SECONDS ]; then
+              echo "should_run=true" >> $GITHUB_OUTPUT
+              echo "✅ 3 days have passed since last run. Proceeding with ping."
+            else
+              echo "should_run=false" >> $GITHUB_OUTPUT
+              echo "⏳ Only $TIME_DIFF seconds have passed. Skipping ping."
+            fi
+          else
+            echo "should_run=true" >> $GITHUB_OUTPUT
+            echo "🆕 No previous run found. Proceeding with first ping."
+          fi
+
+      - name: Ping Supabase
+        if: steps.check-interval.outputs.should_run == 'true'
+        run: |
+          # Replace with your actual Supabase ping logic
+          echo "🏓 Pinging Supabase..."
+          
+          # Example: Health check endpoint
+          # curl -f "${{ secrets.SUPABASE_URL }}/rest/v1/" \
+          #   -H "apikey: ${{ secrets.SUPABASE_ANON_KEY }}" \
+          #   -H "Authorization: Bearer ${{ secrets.SUPABASE_ANON_KEY }}"
+          
+          # For now, just a placeholder
+          echo "Supabase ping completed successfully"
+
+      - name: Update last run timestamp
+        if: steps.check-interval.outputs.should_run == 'true'
+        run: |
+          # Store the current timestamp
+          date +%s > .github/last-ping-timestamp
+          
+          # Configure git for the commit
+          git config --local user.email "action@github.com"
+          git config --local user.name "GitHub Action"
+          
+          # Commit the updated timestamp
+          git add .github/last-ping-timestamp
+          git commit -m "Update last ping timestamp [automated]" || exit 0
+          git push

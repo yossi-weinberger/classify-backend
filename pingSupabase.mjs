@@ -1,9 +1,14 @@
 import { checkSupabaseConnection } from './supabaseConnect.mjs';
 
 async function main() {
-  const success = await checkSupabaseConnection();
-  if (!success) {
-    console.error('Supabase ping failed');
+  try {
+    const success = await checkSupabaseConnection();
+    if (!success) {
+      console.error('Supabase ping failed');
+      process.exitCode = 1;
+    }
+  } catch (error) {
+    console.error('An error occurred while checking Supabase connection:', error);
     process.exitCode = 1;
   }
 }

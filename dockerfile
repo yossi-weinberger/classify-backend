@@ -1,6 +1,6 @@
 # Use an official Node runtime as a parent image
 # Here we use Node.js version 16 to ensure support for modern JavaScript features
-FROM node:16
+FROM node:24
 
 # Set the working directory inside the container
 # This is where all the following commands will be executed

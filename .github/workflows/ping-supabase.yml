@@ -7,12 +7,27 @@ on:
     - cron: '0 0 * * *'
   workflow_dispatch: # Allow manual triggering
 
+permissions:
+  contents: write  # Required for pushing changes
+
 jobs:
   check-and-ping:
     runs-on: ubuntu-latest
     steps:
       - name: Checkout repository
         uses: actions/checkout@v4
+        with:
+          token: ${{ secrets.GITHUB_TOKEN }}
+          
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '18'
+          cache: 'npm'
+          
+      - name: Install dependencies
+        run: npm ci
+        
       - name: Check if 3 days have passed
         id: check-interval
         run: |
@@ -45,17 +60,12 @@ jobs:
 
       - name: Ping Supabase
         if: steps.check-interval.outputs.should_run == 'true'
+        env:
+          SUPABASE_URL: ${{ secrets.SUPABASE_URL }}
+          SUPABASE_KEY: ${{ secrets.SUPABASE_KEY }}
         run: |
-          # Replace with your actual Supabase ping logic
           echo "🏓 Pinging Supabase..."
-          
-          # Example: Health check endpoint
-          # curl -f "${{ secrets.SUPABASE_URL }}/rest/v1/" \
-          #   -H "apikey: ${{ secrets.SUPABASE_ANON_KEY }}" \
-          #   -H "Authorization: Bearer ${{ secrets.SUPABASE_ANON_KEY }}"
-          
-          # For now, just a placeholder
-          echo "Supabase ping completed successfully"
+          npm run ping-supabase
 
       - name: Update last run timestamp
         if: steps.check-interval.outputs.should_run == 'true'
@@ -67,7 +77,12 @@ jobs:
           git config --local user.email "action@github.com"
           git config --local user.name "GitHub Action"
           
-          # Commit the updated timestamp
-          git add .github/last-ping-timestamp
-          git commit -m "Update last ping timestamp [automated]" || exit 0
-          git push
+          # Check if there are changes to commit
+          if git diff --quiet; then
+            echo "No changes to commit"
+          else
+            # Commit the updated timestamp
+            git add .github/last-ping-timestamp
+            git commit -m "Update last ping timestamp [automated]"
+            git push
+          fi

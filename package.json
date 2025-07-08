@@ -8,7 +8,8 @@
     "start": "node index.mjs",
     "server": "nodemon server.js",
     "dev": "node index.mjs",
-    "build": "node index.mjs"
+    "build": "node index.mjs",
+    "ping-supabase": "node pingSupabase.mjs"
   },
   "author": "",
   "license": "ISC",
